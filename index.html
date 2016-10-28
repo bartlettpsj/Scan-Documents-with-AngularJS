@@ -10,6 +10,7 @@
 <div id="dwtcontrolContainer"></div>
 <div ng-controller="twainControl">
 	<button ng-click="acquireImage()">Scan</button>
+	<button ng-click="uploadImage()">Upload</button>
 </div>
 
 <script>
@@ -21,7 +22,26 @@
 			DWObject.OpenSource();                          // Open the source. You can set resolution, pixel type, etc. after this method. Please refer to the sample 'Scan' -> 'Custom Scan' for more info.
 			DWObject.AcquireImage();
 		};
+		$scope.uploadImage = function() {
+			var Digital = new Date();
+			var uploadfilename = Digital.getMilliseconds(); // Uses milliseconds according to local time as the file name
+			var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer'); // Get the Dynamic Web TWAIN object that is embeded in the div with id 'dwtcontrolContainer'.
+			DWObject.HTTPPort = location.port;
+			DWObject.HTTPUploadAllThroughPostAsPDF(strHTTPServer, strActionPage, uploadfilename + ".pdf", OnHttpUploadSuccess, OnHttpServerReturnedSomething);
+		};
 	}
+	function OnHttpUploadSuccess() {
+		console.log('successful');
+	}
+
+	function OnHttpServerReturnedSomething(errorCode, errorString, sHttpResponse) {
+		console.log(errorString);
+		var textFromServer = sHttpResponse;
+	}
+	var CurrentPathName = unescape(location.pathname);
+	var CurrentPath = CurrentPathName.substring(0, CurrentPathName.lastIndexOf("/") + 1);
+	var strHTTPServer = location.hostname;
+	strActionPage = CurrentPath + 'action/csharp.aspx';
 	var app = angular.module('WebScanning', []);
 	app.controller('twainControl',twainControl);
 </script>
