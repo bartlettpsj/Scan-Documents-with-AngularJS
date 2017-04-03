@@ -76,32 +76,27 @@
       $scope.myImageSrc = newImageSrc;
     }
 
-    Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady',
-        function () {
-          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain(
-            'dwtcontrolContainer');
+    Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', function () {
+          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
 
           DWObject.RegisterEvent('OnImageAreaSelected',
-                                 function (sImageIndex, left, top,
-                                           right, bottom) {
+             function (sImageIndex, left, top, right, bottom) {
+               $scope.selected.sImageIndex = sImageIndex;
+               $scope.selected.left = left;
+               $scope.selected.top = top;
+               $scope.selected.right = right;
+               $scope.selected.bottom = bottom;
 
-                                   $scope.selected.sImageIndex =
-                                     sImageIndex;
-                                   $scope.selected.left = left;
-                                   $scope.selected.top = top;
-                                   $scope.selected.right = right;
-                                   $scope.selected.bottom = bottom;
-
-                                   $scope.$apply();
-                                 });
+               $scope.$apply();
+          });
 
           DWObject.RegisterEvent('OnImageAreaDeSelected',
-                                 function (sImageIndex) {
-                                   var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain(
-                                     'dwtcontrolContainer');
-                                   $scope.selected.top = -1;
-                                   $scope.$apply();
-                                 });
+             function (sImageIndex) {
+               var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+               $scope.selected.top = -1;
+
+               $scope.$apply();
+          });
         }
     );
 
