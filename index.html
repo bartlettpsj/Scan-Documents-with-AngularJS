@@ -19,7 +19,7 @@
     </div>
 
     <div id="myimage">
-        <img data-ng-src="{{myImageSrc}}"  width="100" height="100"/>
+        <img ng-src="{{myImageSrc}}"  width="100" height="100"/>
     </div>
 
 </div>
@@ -64,15 +64,13 @@
 
     $scope.test1 = () => {
       var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-      console.log(DWObject.CopyToClipboard(0));
 
       DWObject.SelectedImagesCount = 1;
       DWObject.SetSelectedImageIndex(0, 0);
       DWObject.GetSelectedImagesSize(EnumDWT_ImageType.IT_JPG);
       var imagedata = DWObject.SaveSelectedImagesToBase64Binary();
-      var newImageSrc = "data:image/png;base64," + imagedata;
+      var newImageSrc = "data:image/jpg;base64," + imagedata;
 
-      $scope.image.dataURL = newImageSrc;
       $scope.myImageSrc = newImageSrc;
     }
 
@@ -81,21 +79,21 @@
 
           DWObject.RegisterEvent('OnImageAreaSelected',
              function (sImageIndex, left, top, right, bottom) {
-               $scope.selected.sImageIndex = sImageIndex;
-               $scope.selected.left = left;
-               $scope.selected.top = top;
-               $scope.selected.right = right;
-               $scope.selected.bottom = bottom;
-
-               $scope.$apply();
+               $scope.$apply(function() {
+                 $scope.selected.sImageIndex = sImageIndex;
+                 $scope.selected.left = left;
+                 $scope.selected.top = top;
+                 $scope.selected.right = right;
+                 $scope.selected.bottom = bottom;
+               });
           });
 
           DWObject.RegisterEvent('OnImageAreaDeSelected',
              function (sImageIndex) {
-               var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-               $scope.selected.top = -1;
-
-               $scope.$apply();
+               $scope.$apply(function() {
+                 var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+                 $scope.selected.top = -1;
+               });
           });
         }
     );
