@@ -1,0 +1,21 @@
+<script src="Resources/dynamsoft.webtwain.initiate.js"></script>
+<script src="Resources/dynamsoft.webtwain.config.js"></script>
+
+<script>
+    alert('hello loader');
+</script>
+
+<h1>My Scanning Application</h1>
+<div oc-lazy-load="['Resources/dynamsoft.webtwain.initiate.js', 'Resources/dynamsoft.webtwain.config.js']">
+    blah blah blurb blurb
+</div>
+
+<div id="dwtcontrolContainer"></div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="loadImage()">Load</button>
+    <button class="btn btn-warning" ng-click="cropImage()">Crop</button>
+    <button class="btn btn-primary" type="button" ng-click="modal.doShit()">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-info" type="button" ng-click="hello()">Test</button>
+</div>

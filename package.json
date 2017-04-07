@@ -1,0 +1,24 @@
+{
+  "name": "scandocs",
+  "version": "1.0.0",
+  "description": "scan docs using angular and bootsrap",
+  "main": "mymodalcontroller.js",
+  "dependencies": {
+    "angular-ui-bootstrap": "^2.5.0",
+    "oclazyload": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dynamsoft-dwt/Scan-Documents-with-AngularJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dynamsoft-dwt/Scan-Documents-with-AngularJS/issues"
+  },
+  "homepage": "https://github.com/dynamsoft-dwt/Scan-Documents-with-AngularJS#readme"
+}

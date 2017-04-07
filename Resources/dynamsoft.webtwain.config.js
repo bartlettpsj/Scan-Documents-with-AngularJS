@@ -9,7 +9,9 @@
 /// <reference path="dynamsoft.webtwain.initiate.js" />
 var Dynamsoft = Dynamsoft || { WebTwainEnv: {} };
 
-Dynamsoft.WebTwainEnv.AutoLoad = true;
+// alert('dynamsoft being loaded!');
+
+Dynamsoft.WebTwainEnv.AutoLoad = false;
 ///
 Dynamsoft.WebTwainEnv.Containers = [{ContainerId:'dwtcontrolContainer', Width:505, Height:600}];
 ///

@@ -1,18 +1,25 @@
 <html ng-app="WebScanning">
 <head>
     <title>Scan Documents with AngularJS</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js"></script>
-    <script src="Resources/dynamsoft.webtwain.initiate.js"></script>
-    <script src="Resources/dynamsoft.webtwain.config.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.js"></script>
+    <!--<script src="Resources/dynamsoft.webtwain.initiate.js"></script>-->
+    <!--<script src="Resources/dynamsoft.webtwain.config.js"></script>-->
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script src="node_modules/oclazyload/dist/ocLazyLoad.js"></script>
+
 </head>
 
 <body>
-<div id="dwtcontrolContainer"></div>
 <div ng-controller="twainControl">
+
+    <!--<div id="dwtcontrolContainer"></div>-->
+
     <button ng-click="loadImage()">Load</button>
     <button ng-click="acquireImage()">Scan</button>
     <button ng-click="cropImage()" ng-disabled="selected.top == -1">Crop</button>
     <button ng-click="test1()">Test1</button>
+    <button ng-click="test2()">Test2</button>
 
     <div>
         Value: {{selected.top != -1}}
@@ -26,11 +33,25 @@
 
 
 <script>
-  angular.module('WebScanning', [])
-  .controller('twainControl', ['$scope', '$http', function ($scope, $http) {
+
+  angular.module('WebScanning', ['ui.bootstrap', 'oc.lazyLoad'])
+//  .config(['$ocLazyLoadProvider', function($ocLazyLoadProvider) {
+////    alert('loaded lazy config');
+//    $ocLazyLoadProvider.config(
+//      {
+//        events: true
+//      })
+//  }])
+  .controller('twainControl', ['$scope', '$http', '$uibModal', function ($scope, $http, $uibModal) {
+
+//    $scope.$on('ocLazyLoad.moduleLoaded', function(e, module) {
+//      console.log('M1module loaded', module);
+//      alert('module loaded: ' + module);
+//    });
 
     $scope.selected = {sImageIndex: 0, top: -1, left: 0, right: 0, bottom: 0};
     $scope.image = { dataURL: ""};
+    $scope.$uibModal = $uibModal;
 
     $scope.acquireImage = function () {
       var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer'); // Get the Dynamic Web TWAIN object that is embeded in the div with id 'dwtcontrolContainer'.
@@ -74,32 +95,54 @@
       $scope.myImageSrc = newImageSrc;
     }
 
-    Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', function () {
-          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+    $scope.test2 = () => {
 
-          DWObject.RegisterEvent('OnImageAreaSelected',
-             function (sImageIndex, left, top, right, bottom) {
-               $scope.$apply(function() {
-                 $scope.selected.sImageIndex = sImageIndex;
-                 $scope.selected.left = left;
-                 $scope.selected.top = top;
-                 $scope.selected.right = right;
-                 $scope.selected.bottom = bottom;
-               });
-          });
+      const modalInstance =
+        $uibModal.open({
+          templateUrl: 'mymodaltemplate.html',
+          controller: 'myModalController',
+          bindToController: true,
+          scope: this.$scope,
+          backdrop  : 'static',
+          // keyboard  : false,
+          size: 'lg',
+          controllerAs: 'modal',
+          resolve: {
+          }
+        });
 
-          DWObject.RegisterEvent('OnImageAreaDeSelected',
-             function (sImageIndex) {
-               $scope.$apply(function() {
-                 var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-                 $scope.selected.top = -1;
-               });
-          });
-        }
-    );
+
+    }
+
+//    Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', function () {
+//          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+//
+//          DWObject.RegisterEvent('OnImageAreaSelected',
+//             function (sImageIndex, left, top, right, bottom) {
+//               $scope.$apply(function() {
+//                 $scope.selected.sImageIndex = sImageIndex;
+//                 $scope.selected.left = left;
+//                 $scope.selected.top = top;
+//                 $scope.selected.right = right;
+//                 $scope.selected.bottom = bottom;
+//               });
+//          });
+//
+//          DWObject.RegisterEvent('OnImageAreaDeSelected',
+//             function (sImageIndex) {
+//               $scope.$apply(function() {
+//                 var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+//                 $scope.selected.top = -1;
+//               });
+//          });
+//        }
+//    );
 
   }]);
 
 </script>
+
+<script src="mymodalcontroller.js"></script>
+
 </body>
 </html>
