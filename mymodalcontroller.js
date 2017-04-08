@@ -7,8 +7,8 @@ angular.module('WebScanning')
 }])
 .controller('myModalController', ['$scope', '$uibModalInstance', '$ocLazyLoad', '$timeout',  function ($scope, $uibModalInstance, $ocLazyLoad, $timeout) {
 
-  $scope.dynamsoftLoaded = false;
-  $scope.firstFileLoaded = false;
+  //$scope.dynamsoftLoaded = false;
+  //$scope.firstFileLoaded = false;
   $scope.selected = {sImageIndex: 0, top: -1, left: 0, right: 0, bottom: 0};
   $scope.loadCount = 0;
 
@@ -26,119 +26,66 @@ angular.module('WebScanning')
     $scope.$uibModalInstance.close('cancel');
     console.log('Thanks Cancelled');
     Dynamsoft.WebTwainEnv.Unload();
-    $scope.dynamsoftLoaded = false;
-  };
-
-  $scope.registerDynamsoftEvents = function () {
-    var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-
-    DWObject.RegisterEvent('OnImageAreaSelected',
-      function (sImageIndex, left, top, right, bottom) {
-       $scope.$apply(function () {
-         $scope.selected.sImageIndex = sImageIndex;
-         $scope.selected.left = left;
-         $scope.selected.top = top;
-         $scope.selected.right = right;
-         $scope.selected.bottom = bottom;
-       });
-    });
-
-    DWObject.RegisterEvent('OnImageAreaDeSelected',
-       function (sImageIndex) {
-         $scope.$apply(function () {
-           var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-           $scope.selected.top = -1;
-         });
-     });
+    //$scope.dynamsoftLoaded = false;
   };
 
   $scope.setupDynamsoft = function() {
     Dynamsoft.WebTwainEnv.Containers = [{ContainerId:'dwtcontrolContainer',Width:600,Height:350}];
     Dynamsoft.WebTwainEnv.Load();
-    $scope.dynamsoftLoaded = true;
 
     Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', function () {
-      alert('OnWebTwain Ready');
-      $scope.registerDynamsoftEvents();
+      //alert('OnWebTwain Ready');
+
+      var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+
+      // Save selected area
+      DWObject.RegisterEvent('OnImageAreaSelected',
+         function (sImageIndex, left, top, right, bottom) {
+           $scope.$apply(function () {
+             $scope.selected.sImageIndex = sImageIndex;
+             $scope.selected.left = left;
+             $scope.selected.top = top;
+             $scope.selected.right = right;
+             $scope.selected.bottom = bottom;
+           });
+         });
+
+      // Deselect area
+      DWObject.RegisterEvent('OnImageAreaDeSelected',
+         function (sImageIndex) {
+           $scope.$apply(function () {
+             var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+             $scope.selected.top = -1;
+           });
+         });
     });
   }
 
+  // If Dynamsoft libraries loaded initialise Dynamsoft immediately
   if (typeof Dynamsoft != 'undefined') {
-    alert('Dynamsoft is already defined, so Loading');
     $scope.setupDynamsoft();
-
-    //Dynamsoft.WebTwainEnv.Load();
-    //$scope.registerDynamsoftEvents();
-    //$scope.dynamsoftLoaded = true;
   }
 
+  // Wait for both files to be loaded then setup Dynamsoft
   $scope.$on('ocLazyLoad.fileLoaded', function(e, file) {
-    console.log('file loaded', file);
-
     $scope.loadCount++;
 
     if (typeof Dynamsoft != 'undefined'  && $scope.loadCount == 2) {
-      alert('Both files for Dynamsoft has been loaded and initialized');
       $scope.setupDynamsoft();
-
-      // $scope.firstFileLoaded = true;
-      //$scope.librariesLoaded = true;
-      //Dynamsoft.WebTwainEnv.Containers = [{ContainerId:'dwtcontrolContainer',Width:600,Height:350}];
-
-      // Timeout is not ideal, but the OnWebTwainready is missed due to
-      // the timing of the ocLazyLoading
-      //Dynamsoft.WebTwainEnv.Load() ;
-      //$scope.registerDynamsoftEvents();
-
-      //Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', function () {
-      //  alert('OnWebTwain Ready');
-      //});
-
-      $timeout(function() {
-        // alert('timeout');
-
-        //Dynamsoft.WebTwainEnv.Load() ;
-        //$scope.dynamsoftLoaded = true;
-        //$scope.registerDynamsoftEvents();
-
-        //var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
-        //
-        //DWObject.RegisterEvent('OnImageAreaSelected',
-        //                       function (sImageIndex, left, top, right, bottom) {
-        //                         $scope.$apply(function () {
-        //                           $scope.selected.sImageIndex = sImageIndex;
-        //                           $scope.selected.left = left;
-        //                           $scope.selected.top = top;
-        //                           $scope.selected.right = right;
-        //                           $scope.selected.bottom = bottom;
-        //                         });
-        //                       });
-        //
-        //DWObject.RegisterEvent('OnImageAreaDeSelected',
-        //                       function (sImageIndex) {
-        //                         $scope.$apply(function () {
-        //                           var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain(
-        //                             'dwtcontrolContainer');
-        //                           $scope.selected.top = -1;
-        //                         });
-        //                       });
-      }, 10000);
-      //    }
-      // );
     }
   });
 
+  // Maully load an image into dynamsoft
   $scope.loadImage = function () {
-    var OnSuccess = function () {
-    };
-    var OnFailure = function (errorCode, errorString) {
-    };
-
-    var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer'); // Get the Dynamic Web TWAIN object that is embeded in the div with id 'dwtcontrolContainer'.
+    var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
     DWObject.IfShowFileDialog = true;
-    DWObject.LoadImageEx("", EnumDWT_ImageType.IT_ALL, OnSuccess, OnFailure);
+    DWObject.LoadImageEx("",
+                         EnumDWT_ImageType.IT_ALL,
+                         function () {}, // Success
+                         function (errorCode, errorString) { }); // Failure
   };
 
+  // Crop the selected image
   $scope.cropImage = function () {
     if ($scope.selected.top != -1) {
       var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
@@ -149,7 +96,5 @@ angular.module('WebScanning')
                     $scope.selected.bottom);
     }
   };
-
-
 
 }]);
